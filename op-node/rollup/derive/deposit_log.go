@@ -123,13 +123,15 @@ func unmarshalDepositVersion0(dep *types.DepositTx, to common.Address, opaqueDat
 	offset += 8
 
 	// uint8 isCreation
+	isCreation := opaqueData[offset] == 1
 	// isCreation: If the boolean byte is 1 then dep.To will stay nil,
 	// and it will create a contract using L2 account nonce to determine the created address.
-	if opaqueData[offset] == 0 {
-		dep.To = &to
+	// Only set To address to nil if this is explicitly a contract creation
+	// Otherwise use the 'to' address from the event topics
+	if !isCreation {
+    	dep.To = &to
 	}
 	offset += 1
-
 	// The remainder of the opaqueData is the transaction data (without length prefix).
 	// The data may be padded to a multiple of 32 bytes
 	txDataLen := uint64(len(opaqueData)) - offset
