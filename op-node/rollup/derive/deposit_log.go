@@ -93,6 +93,8 @@ func UnmarshalDepositLogEvent(ev *types.Log) (*types.DepositTx, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode deposit (version %s): %w", version, err)
 	}
+	// Explicitly set dep.To to ensure consistency
+	dep.To = &to
 	return &dep, nil
 }
 
